@@ -1,0 +1,123 @@
+package test;
+
+public class DoublyList<T> {
+private DoubleNode<T> head;
+public DoublyList(){
+	this.head=new DoubleNode<T>();
+	this.head.prev=this.head;
+	this.head.next=this.head;
+}
+	public boolean isEmpty(){
+		return this.head.next==null;
+	}
+	public DoublyList(T[] values){
+		this();
+		DoubleNode<T>rear=this.head;
+		for(int i=0;i<values.length;i++){
+			rear.next=new DoubleNode<T>(values[i],rear,null);
+			rear=rear.next;
+		}
+	}
+	public DoubleNode<T> insert(int i,T x){
+		if(x==null)
+			throw new NullPointerException("x==null");
+		DoubleNode<T> front=this.head;
+		for(int j=0;front!=null&j<i;j++)
+			front=front.next;
+		DoubleNode <T>q=new DoubleNode<T>(x,front,front.next);
+		front.prev.next=q;
+		front.next=q;
+		return q;
+	}
+	public String toString(){
+		String str=this.getClass().getName()+"(";
+		for(DoubleNode<T>p=this.head.next;p!=null;p=p.next){
+			str+=p.data.toString();
+			if(p.next!=null){
+				str+=",";
+			}
+		}
+		return str+")";
+	}
+	/**
+	 * 替换所有与pattern 匹配的子表
+	 */
+	public void replaceAll(CirSinglyList<T> pattern,CirSinglyList<T>replace_list){
+		int count=0;//匹配次数
+		Node<T> pattern_front=pattern.head.next;
+		DoubleNode<T> list_front=head.next;
+	    DoubleNode<T> first_node=this.head.next;//保存第一个匹配的字符，便于回溯
+	    /*
+	     * 替代操作
+	     */
+		while(list_front!=null) {
+			//说明pattern内字符匹配完
+			if(pattern_front==pattern.head) {
+				count=0;
+				pattern_front=pattern.head.next;	
+				Node<T> replace_front=replace_list.head.next;
+				first_node=first_node.prev;//左移一个节点
+				while(replace_front!=replace_list.head) {	
+				  first_node.next=new DoubleNode<T>(replace_front.data,first_node,null);
+				  first_node=first_node.next;
+				  replace_front=replace_front.next;
+				}
+				first_node.next=list_front;
+	           // if(list_front.next!=null)//如果匹配到最后一个字符
+	              list_front.prev=first_node;
+	              first_node=first_node.next;
+			}
+			//匹配操作
+		if(list_front.data.equals(pattern_front.data)) {//首先确定第一个字符是否匹配
+			count++;
+			if(count==1)//count 为1时保存开始匹配的节点
+			first_node=list_front;
+		 	list_front=list_front.next;	
+			pattern_front=pattern_front.next;		
+			if(list_front==null)//当链表剩余长度少于pattern长度 ，停止匹配，匹配失败
+				break;
+		}else {
+			count=0;//重置，重新开始匹配
+    	    list_front=first_node.next;//失败，在list的下一节点出重新匹配   	  	    	 
+			first_node=first_node.next;				 
+			pattern_front=pattern.head.next;//回到pattern第一个节点
+		}
+		}
+	}
+	
+protected class DoubleNode<T>{
+	public T data;
+	public DoubleNode<T>prev,next;
+	public DoubleNode(T data,DoubleNode<T> prev,DoubleNode<T> next){
+		this.data=data;
+		this.prev=prev;
+		this.next=next;
+	}
+	public DoubleNode(T data){
+		this.data=data;
+	}
+	public DoubleNode(){
+		this(null,null,null);
+	}
+	public String toString(){
+		return this.data.toString();
+	}
+}
+public static void main(String[] args){
+	Integer[] replace_array={4,5,6};
+	Integer[] list_array={1,2,7,8,7,8,9,6,7,8,9,7,8};
+	Integer[] pattern_array={7,8,9};
+	CirSinglyList<Integer> replaceList=new CirSinglyList<Integer>(replace_array);//用于替换的表\
+	DoublyList<Integer> list=new DoublyList<Integer>(list_array);
+	System.out.println(list.toString());
+	System.out.println(replaceList.toString());
+	/**
+	 * 执行替换操作
+	 */
+	CirSinglyList<Integer> patternList=new CirSinglyList<Integer>(pattern_array);
+	System.out.println(patternList.toString());
+	list.replaceAll(patternList, replaceList);
+	System.out.println(list.toString());
+
+}
+}
