@@ -1,5 +1,3 @@
-package test;
-
 public class DoublyList<T> {
 private DoubleNode<T> head;
 public DoublyList(){
@@ -42,47 +40,33 @@ public DoublyList(){
 	/**
 	 * 替换所有与pattern 匹配的子表
 	 */
-	public void replaceAll(CirSinglyList<T> pattern,CirSinglyList<T>replace_list){
-		int count=0;//匹配次数
-		Node<T> pattern_front=pattern.head.next;
-		DoubleNode<T> list_front=head.next;
-	    DoubleNode<T> first_node=this.head.next;//保存第一个匹配的字符，便于回溯
-	    /*
-	     * 替代操作
-	     */
-		while(list_front!=null) {
-			//说明pattern内字符匹配完
-			if(pattern_front==pattern.head) {
-				count=0;
-				pattern_front=pattern.head.next;	
-				Node<T> replace_front=replace_list.head.next;
-				first_node=first_node.prev;//左移一个节点
-				while(replace_front!=replace_list.head) {	
-				  first_node.next=new DoubleNode<T>(replace_front.data,first_node,null);
-				  first_node=first_node.next;
+	public void replaceAll(CirSinglyList<T> pattern,CirSinglyList<T>replace){
+		Node<T> q=pattern.head.next;
+		DoubleNode<T> p=head.next;
+	    DoubleNode<T> f=this.head;//保存第一个匹配的字符，便于回溯
+		while(p!=null) {
+			if(p.data.equals(q.data)) {//首先确定第一个字符是否匹配
+			 	p=p.next;
+				q=q.next;		
+			}else {
+				f=f.next;
+	    	    p=f.next;//失败，在list的下一节点出重新匹配   	  	    	 			 
+				q=pattern.head.next;//回到pattern第一个节点
+			}
+			if(q==pattern.head) {
+				q=pattern.head.next;	
+				Node<T> replace_front=replace.head.next;
+				while(replace_front!=replace.head) {	
+				  f.next=new DoubleNode<T>(replace_front.data,f,null);
+				  f=f.next;
 				  replace_front=replace_front.next;
 				}
-				first_node.next=list_front;
-	           // if(list_front.next!=null)//如果匹配到最后一个字符
-	              list_front.prev=first_node;
-	              first_node=first_node.next;
-			}
-			//匹配操作
-		if(list_front.data.equals(pattern_front.data)) {//首先确定第一个字符是否匹配
-			count++;
-			if(count==1)//count 为1时保存开始匹配的节点
-			first_node=list_front;
-		 	list_front=list_front.next;	
-			pattern_front=pattern_front.next;		
-			if(list_front==null)//当链表剩余长度少于pattern长度 ，停止匹配，匹配失败
-				break;
-		}else {
-			count=0;//重置，重新开始匹配
-    	    list_front=first_node.next;//失败，在list的下一节点出重新匹配   	  	    	 
-			first_node=first_node.next;				 
-			pattern_front=pattern.head.next;//回到pattern第一个节点
-		}
-		}
+				  f.next=p;
+	              p.prev=f;
+	              q=pattern.head.next;
+			    }
+		
+	}
 	}
 	
 protected class DoubleNode<T>{
